@@ -577,6 +577,13 @@ let gameState = {
             stats: { wins: 0, loss: 0 }
         };
 
+// --- MISSING VARIABLES FIX ---
+let isEnglish = true; // Default language
+let isRoundActive = false; // Is a game currently happening?
+let isProcessing = false; // Is an animation playing?
+let currentBetContext = { active: false, amount: 0, target: null, multiplier: 0 }; // Bet details
+// -----------------------------
+
 const i18n = {
     en: { 
         toggle: 'EN', placeholder: 'Add option...', addBtn: 'DROP', flushLabel: 'FLUSH', 
@@ -1259,5 +1266,6 @@ function updateLanguage() {
 </body>
 
 </html>
+
 
 
