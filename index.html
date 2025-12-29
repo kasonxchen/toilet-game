@@ -577,21 +577,6 @@ let gameState = {
             stats: { wins: 0, loss: 0 }
         };
 
-        // ...
-
-        function init() {
-            const saved = localStorage.getItem('flushGameState');
-            if (saved) {
-                const loaded = JSON.parse(saved);
-                // CHANGED: Removed the line that forced 'feat_upload' back in
-                gameState = loaded;
-            }
-            updateCurrencyUI();
-            applyToiletSkin();
-            updateLanguage();
-            checkUrlParams(); 
-        }
-
 const i18n = {
     en: { 
         toggle: 'EN', placeholder: 'Add option...', addBtn: 'DROP', flushLabel: 'FLUSH', 
@@ -656,8 +641,7 @@ const i18n = {
             const saved = localStorage.getItem('flushGameState');
             if (saved) {
                 const loaded = JSON.parse(saved);
-                // Merge loaded state but ensure feat_upload is kept if user is testing
-                if(!loaded.inventory.includes('feat_upload')) loaded.inventory.push('feat_upload');
+                // CHANGED: Removed the line that forced 'feat_upload' back in
                 gameState = loaded;
             }
             updateCurrencyUI();
@@ -1275,4 +1259,5 @@ function updateLanguage() {
 </body>
 
 </html>
+
 
