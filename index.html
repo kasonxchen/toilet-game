@@ -1,0 +1,1238 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <!-- Google tag (gtag.js) -->
+    <script async src="https://www.googletagmanager.com/gtag/js?id=G-8Y4XXK9EMZ"></script>
+    <script>
+      window.dataLayer = window.dataLayer || [];
+      function gtag(){dataLayer.push(arguments);}
+      gtag('js', new Date());
+
+      gtag('config', 'G-8Y4XXK9EMZ');
+    </script>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, height=device-height, initial-scale=1.0, maximum-scale=1.0, user-scalable=no">
+    <title>The Toilet Flush Eliminator: Deluxe Edition</title>
+    <script src="html2canvas.min.js"></script>
+
+    <style>
+        :root {
+            --porcelain: #ffffff;
+            --porcelain-shadow: #d1d5db;
+            --water-deep: #0ea5e9;
+            --water-light: #38bdf8;
+            --accent: #f59e0b;
+            --green: #22c55e;
+            --red: #ef4444;
+            --text: #374151;
+            --modal-bg: #1e293b;
+        }
+
+        * {
+            box-sizing: border-box;
+            user-select: none;
+            -webkit-tap-highlight-color: transparent;
+        }
+
+        body {
+            margin: 0;
+            padding: 0;
+            height: 100dvh;
+            width: 100vw;
+            font-family: "Microsoft YaHei", "Heiti SC", "SimHei", sans-serif;
+            overflow: hidden;
+            display: flex;
+            flex-direction: column;
+            align-items: center;
+            justify-content: space-between;
+            
+            /* --- RESTORED BACKGROUND IMAGE --- */
+            background-color: #f1f5f9;
+            background-image: url('assets/background.jpg'); 
+            background-size: cover; 
+            background-position: center;
+            background-repeat: no-repeat;
+        }
+
+        /* --- UI ELEMENTS --- */
+        .share-result-btn {
+            position: relative;
+            background: #f59e0b; color: #451a03; border: 4px solid white;
+            padding: 12px 30px; font-size: 18px; font-weight: 700;
+            border-radius: 50px; margin-top: 15px; cursor: pointer;
+            display: flex; align-items: center; justify-content: center; gap: 8px;
+            box-shadow: 0 6px 0 rgba(0,0,0,0.2);
+        }
+        .share-result-btn:active { transform: translateY(6px); box-shadow: none; }
+
+        .reward-badge {
+            position: absolute; top: -12px; right: -10px;
+            background: #ef4444; color: white; font-size: 12px; font-weight: 800;
+            padding: 4px 8px; border-radius: 12px; border: 2px solid white;
+            box-shadow: 0 4px 4px rgba(0,0,0,0.3); z-index: 10;
+            animation: bounceBadge 2s infinite ease-in-out;
+            display: none; 
+        }
+
+        @keyframes bounceBadge {
+            0%, 100% { transform: translateY(0); }
+            50% { transform: translateY(-4px); }
+        }
+
+        .share-link-btn { background: #8b5cf6; color: white; border-color: #5b21b6; margin-right: 10px; }
+        
+        .toast {
+            position: fixed; top: 100px; left: 50%; transform: translateX(-50%);
+            background: rgba(0,0,0,0.9); color: white; padding: 12px 25px;
+            border-radius: 30px; font-weight: bold; opacity: 0; pointer-events: none;
+            transition: opacity 0.3s; z-index: 1000;
+        }
+        .toast.show { opacity: 1; }
+
+        /* --- HIDDEN CARD FOR IMAGE GENERATION --- */
+        #socialCardCanvas {
+            position: fixed; top: -9999px; left: -9999px;
+            width: 600px; height: 600px;
+            background: radial-gradient(circle at center, #334155, #0f172a);
+            font-family: 'Fredoka', sans-serif;
+            display: flex; align-items: center; justify-content: center;
+            border: 20px solid #f59e0b;
+            overflow: hidden;
+        }
+        .card-bg-icon { position: absolute; font-size: 400px; opacity: 0.05; transform: rotate(-20deg); }
+        .card-content { position: relative; z-index: 2; display: flex; flex-direction: column; align-items: center; width: 100%; }
+        .card-header { color: #fbbf24; font-size: 36px; font-weight: 900; letter-spacing: 2px; margin-bottom: 20px; text-shadow: 0 4px 0 rgba(0,0,0,0.5); }
+        .card-avatar-box { width: 280px; height: 280px; margin: 10px 0 30px 0; display: flex; justify-content: center; align-items: center; filter: drop-shadow(0 0 30px rgba(255, 215, 0, 0.4)); }
+        .card-avatar-box img { width: 250px; height: 250px; object-fit: cover; border-radius: 50%; border: 10px solid white; }
+        .card-avatar-box .winner-visual-icon { font-size: 220px; }
+        .card-winner-name { color: white; font-size: 48px; font-weight: 800; text-transform: uppercase; text-shadow: 0 4px 10px rgba(0,0,0,0.5); max-width: 90%; text-align: center; }
+        .card-footer { color: #94a3b8; margin-top: 15px; font-size: 18px; font-weight: 600; }
+
+        /* --- Top Bar --- */
+        .top-bar {
+            width: 100%; padding: 15px; display: flex; justify-content: space-between; align-items: center;
+            position: absolute; top: 0; z-index: 20; pointer-events: none;
+        }
+        .bar-left, .bar-right { display: flex; gap: 10px; align-items: center; pointer-events: auto; }
+
+        .currency-display {
+            background: rgba(255, 255, 255, 0.95); border: 3px solid var(--accent);
+            border-radius: 25px; padding: 8px 16px; font-weight: 800; font-size: 16px;
+            color: var(--text); display: flex; align-items: center; gap: 6px;
+            box-shadow: 0 4px 0 rgba(0,0,0,0.15);
+        }
+
+        .icon-btn {
+            background: white; border: 2px solid var(--text); border-radius: 20px;
+            padding: 8px 16px; font-weight: 700; font-family: inherit; cursor: pointer;
+            box-shadow: 0 4px 0 rgba(0,0,0,0.2); transition: transform 0.1s ease;
+        }
+        .icon-btn:active { transform: translateY(4px); box-shadow: none; }
+        
+        .shop-btn { 
+            background: var(--accent); color: white; border: 2px solid #b45309;
+            box-shadow: 0 4px 0 #92400e; text-shadow: 1px 1px 0 rgba(0,0,0,0.2);
+        }
+
+        /* --- Toilet Assembly --- */
+        .toilet-wrapper {
+            position: relative; flex-grow: 1; display: flex; justify-content: center;
+            align-items: center; width: 100%; margin-bottom: 120px;
+        }
+
+        .tank {
+            position: absolute; top: 20%; width: 220px; height: 80px;
+            background: var(--porcelain); border-radius: 20px;
+            box-shadow: 0 10px 0 var(--porcelain-shadow), 0 15px 10px rgba(0,0,0,0.1);
+            z-index: 1; transition: background 0.3s;
+        }
+
+        .indicator-group {
+            position: absolute; top: -60px; right: 8px; display: flex;
+            flex-direction: column; align-items: center; pointer-events: none; z-index: 5;
+        }
+        .indicator-text {
+            background: var(--red); color: white; padding: 4px 10px; border-radius: 8px;
+            font-size: 14px; font-weight: 800; border: 2px solid white;
+            box-shadow: 0 2px 4px rgba(0,0,0,0.2); margin-bottom: 4px;
+        }
+        .indicator-arrow {
+            width: 0; height: 0; border-left: 10px solid transparent;
+            border-right: 10px solid transparent; border-top: 14px solid var(--red);
+            filter: drop-shadow(0 2px 2px rgba(0,0,0,0.2));
+            animation: bounceArrow 1s infinite alternate;
+        }
+
+        @keyframes bounceArrow { 0% { transform: translateY(0); } 100% { transform: translateY(8px); } }
+
+        .handle-base {
+            position: absolute; top: 50%; transform: translateY(-50%); right: 20px; 
+            width: 55px; height: 55px; background: #f1f5f9; border: 3px solid #94a3b8;
+            border-radius: 50%; box-shadow: inset 0 -4px 5px rgba(0,0,0,0.1), 0 4px 0 rgba(0,0,0,0.2);
+            cursor: pointer; touch-action: manipulation; z-index: 2;
+        }
+        .handle-lever {
+            width: 80px; height: 16px; background: linear-gradient(to bottom, #ffffff, #cbd5e1);
+            border-radius: 8px; position: absolute; right: 12px; top: 16px;
+            transform-origin: right center; transition: transform 0.2s cubic-bezier(0.175, 0.885, 0.32, 1.275);
+            border: 2px solid #64748b; box-shadow: 0 2px 4px rgba(0,0,0,0.2);
+        }
+        .handle-base:active .handle-lever { transform: rotate(45deg); }
+
+        .bowl {
+            position: relative; z-index: 2; width: 280px; height: 340px;
+            background: var(--porcelain); border-radius: 40% 40% 45% 45%;
+            box-shadow: inset 0 -15px 10px rgba(0,0,0,0.05), 0 10px 0 var(--porcelain-shadow), 0 20px 20px rgba(0,0,0,0.15);
+            display: flex; justify-content: center; align-items: center;
+            margin-top: 120px; transition: background 0.3s; background-size: cover; background-position: center;
+        }
+
+        /* --- RESTORED TOILET SKINS --- */
+        .skin-gold .tank, .skin-gold .bowl {
+            background: radial-gradient(circle at 30% 30%, #fcd34d, #b45309);
+            box-shadow: 0 10px 0 #92400e, 0 20px 20px rgba(0,0,0,0.3);
+            background-image: url('assets/skin_gold.jpg');
+        }
+        .skin-diamond .tank, .skin-diamond .bowl {
+            background: radial-gradient(circle at 30% 30%, #e0f2fe, #38bdf8);
+            box-shadow: 0 10px 0 #0284c7, 0 0 15px #7dd3fc;
+            background-image: url('assets/skin_diamond.jpg');
+        }
+        .skin-chinese .tank, .skin-chinese .bowl {
+            background: #7f1d1d; border: 2px solid #fcd34d;
+            box-shadow: 0 10px 0 #450a0a;
+            background-image: url('assets/skin_chinese.jpg');
+        }
+
+        .water {
+            width: 200px; height: 250px; position: relative; overflow: hidden;
+            margin-top: 10px; border-radius: 40% 40% 45% 45%;
+            box-shadow: inset 0 10px 20px rgba(0,0,0,0.3);
+            background: radial-gradient(circle at 50% 60%, #020617 0%, #0369a1 15%, transparent 35%),
+                        radial-gradient(circle at 50% 0%, var(--water-light), var(--water-deep));
+        }
+
+        .floater {
+            position: absolute; width: 65px; height: 65px; 
+            display: flex; justify-content: center; align-items: center;
+            color: #ffffff !important; font-family: 'Fredoka', sans-serif;
+            font-size: 14px; font-weight: 700; text-align: center; line-height: 1.1;
+            text-shadow: -1px -1px 0 #000, 1px -1px 0 #000, -1px 1px 0 #000, 1px 1px 0 #000, 0 3px 5px rgba(0,0,0,0.5);
+            transform-origin: center center;
+            animation: bob 3s ease-in-out infinite alternate; animation-delay: var(--delay);
+            transition: all 0.5s ease; cursor: pointer; z-index: 10;
+        }
+        
+        .floater::before {
+            content: var(--floater-skin, "💩"); position: absolute; font-size: 65px; 
+            top: 50%; left: 50%; transform: translate(-50%, -50%); 
+            z-index: -1; filter: drop-shadow(0 4px 4px rgba(0,0,0,0.4)); 
+        }
+
+        /* --- FIXED CUSTOM IMAGE STYLING --- */
+        .floater.custom-img {
+            color: transparent !important;
+            text-shadow: none !important;
+        }
+        
+        .floater.custom-img::before {
+            content: '' !important; 
+            width: 65px; height: 65px; 
+            background-image: var(--bg-img);
+            background-size: cover; 
+            background-position: center; 
+            border-radius: 50%;
+            border: 3px solid white; 
+            box-shadow: 0 4px 6px rgba(0,0,0,0.3);
+            /* Important for correct rendering */
+            z-index: 2; 
+        }
+
+        .floater.selected { z-index: 20; }
+        .floater.selected::after {
+            content: ''; position: absolute; top: -8px; left: -8px; right: -8px; bottom: -8px;
+            border: 4px solid var(--accent); border-radius: 50%; animation: pulseSelect 1s infinite; pointer-events: none;
+            z-index: 5;
+        }
+
+        @keyframes pulseSelect { 0% { opacity: 0.6; transform: scale(1); } 100% { opacity: 0; transform: scale(1.3); } }
+        @keyframes bob { 0% { transform: translate(0, 0) rotate(-3deg); } 100% { transform: translate(0, -8px) rotate(3deg); } }
+        .floater.surviving { animation: shake 0.2s linear infinite !important; }
+        @keyframes shake { 0% { transform: translate(1px, 1px) rotate(0deg); } 50% { transform: translate(-3px, 0px) rotate(1deg); } 100% { transform: translate(1px, -1px) rotate(-1deg); } }
+
+        .floater.flushing-down {
+            animation: spiralDown 1s cubic-bezier(0.55, 0.085, 0.68, 0.53) forwards !important;
+            pointer-events: none; z-index: 1;
+        }
+        @keyframes spiralDown {
+            0% { transform: scale(1) rotate(0deg); opacity: 1; }
+            100% { top: 60%; left: 50%; transform: translate(-50%, -50%) scale(0) rotate(1080deg); opacity: 0; }
+        }
+
+        /* --- Footer & Betting --- */
+        .footer-wrapper { position: fixed; bottom: 0; width: 100%; display: flex; flex-direction: column; z-index: 50; }
+        .betting-panel {
+            background: linear-gradient(to bottom, #fffbeb, #fff); padding: 12px 15px;
+            display: flex; gap: 12px; align-items: flex-end; justify-content: space-between;
+            border-top: 3px solid var(--accent); box-shadow: 0 -4px 10px rgba(0,0,0,0.05); z-index: 60;
+        }
+        .bet-group { display: flex; flex-direction: column; gap: 4px; }
+        .bet-group.grow { flex-grow: 1; }
+        .bet-label { font-size: 11px; text-transform: uppercase; color: #b45309; font-weight: 800; letter-spacing: 0.5px; margin-left: 2px; }
+        
+        .bet-select { width: 100%; padding: 10px; border-radius: 12px; border: 2px solid #fcd34d; background: white; font-family: inherit; font-weight: 700; color: var(--text); outline: none; height: 42px; }
+        
+        .wager-stepper {
+            display: flex; align-items: center; background: white; border: 2px solid #fcd34d;
+            border-radius: 12px; height: 42px; overflow: hidden;
+        }
+        .wager-btn {
+            width: 35px; height: 100%; border: none; background: #fff7ed; color: #b45309;
+            font-weight: 900; font-size: 18px; cursor: pointer; display: flex; align-items: center; justify-content: center;
+        }
+        .wager-btn:active { background: #fed7aa; }
+        .bet-input { 
+            border: none; border-left: 1px solid #fcd34d; border-right: 1px solid #fcd34d; 
+            border-radius: 0; width: 60px; text-align: center; height: 100%;
+            font-weight: 700; color: var(--text); outline: none;
+        }
+
+        .payout-box {
+            display: flex; flex-direction: column; align-items: center; justify-content: center;
+            background: var(--green); color: white; border-radius: 12px;
+            padding: 0 12px; height: 42px; min-width: 70px; box-shadow: 0 4px 0 #15803d;
+        }
+        .payout-label { font-size: 8px; font-weight: 700; margin-bottom: -2px; }
+        .payout-value { font-size: 18px; font-weight: 800; }
+
+        .input-area {
+            width: 100%; padding: 15px 20px; padding-bottom: max(15px, env(safe-area-inset-bottom));
+            background: rgba(255,255,255,0.85); backdrop-filter: blur(8px);
+            display: flex; gap: 10px;
+        }
+        .input-wrapper { flex-grow: 1; position: relative; display: flex; }
+        .floater-input {
+            width: 100%; padding: 15px; padding-right: 45px; border: 2px solid var(--porcelain-shadow);
+            border-radius: 50px; font-family: 'Fredoka', sans-serif; font-size: 16px; outline: none;
+        }
+        .upload-trigger {
+            position: absolute; right: 5px; top: 50%; transform: translateY(-50%);
+            background: #e2e8f0; border: none; border-radius: 50%; width: 40px; height: 40px;
+            cursor: pointer; display: flex; align-items: center; justify-content: center; font-size: 20px;
+        }
+        .upload-trigger:active { background: #cbd5e1; transform: translateY(-50%) scale(0.95); }
+        .add-btn {
+            background: var(--water-deep); color: white; border: none; border-radius: 50px;
+            padding: 0 25px; font-family: 'Fredoka', sans-serif; font-weight: 700; font-size: 16px;
+            cursor: pointer; box-shadow: 0 4px 0 #0284c7; touch-action: manipulation;
+        }
+        .add-btn:active { transform: translateY(4px); box-shadow: none; }
+        .add-btn:disabled { opacity: 0.5; cursor: not-allowed; transform: none; box-shadow: none; }
+
+        /* --- SHOP MODAL --- */
+        .modal-overlay {
+            position: fixed; top: 0; left: 0; width: 100%; height: 100%;
+            background: rgba(0,0,0,0.7); z-index: 300; display: none;
+            justify-content: center; align-items: center; backdrop-filter: blur(5px);
+        }
+        .modal-overlay.open { display: flex; }
+
+        .shop-content {
+            background: var(--modal-bg); width: 90%; max-width: 450px; height: 80%;
+            border-radius: 25px; border: 4px solid var(--accent);
+            display: flex; flex-direction: column; overflow: hidden;
+            box-shadow: 0 20px 50px rgba(0,0,0,0.5);
+        }
+        .shop-header {
+            padding: 20px; background: rgba(0,0,0,0.2);
+            display: flex; justify-content: space-between; align-items: center; color: white;
+        }
+        .shop-header h2 { margin: 0; font-size: 24px; color: var(--accent); }
+        .close-shop { background: none; border: none; color: white; font-size: 28px; cursor: pointer; }
+        .shop-grid {
+            flex-grow: 1; overflow-y: auto; padding: 15px;
+            display: grid; grid-template-columns: repeat(2, 1fr); gap: 15px;
+        }
+        .shop-item {
+            background: #334155; border-radius: 15px; padding: 15px;
+            display: flex; flex-direction: column; align-items: center;
+            color: white; border: 2px solid transparent; transition: transform 0.1s;
+        }
+        .shop-item.owned { border-color: var(--green); background: #1e293b; }
+        .shop-item.equipped { border-color: var(--accent); background: #3f2c08; }
+        .item-icon { font-size: 40px; margin-bottom: 5px; }
+        .item-name { font-size: 14px; font-weight: bold; margin-bottom: 5px; text-align: center; }
+        .item-cost { font-size: 12px; color: #fbbf24; margin-bottom: 10px; }
+        .shop-action-btn {
+            width: 100%; padding: 8px; border-radius: 8px; border: none;
+            font-weight: bold; cursor: pointer; font-family: inherit;
+        }
+        .btn-buy { background: var(--accent); color: #451a03; }
+        .btn-equip { background: var(--green); color: white; }
+        .btn-equipped { background: transparent; color: var(--accent); border: 2px solid var(--accent); cursor: default; }
+
+        /* --- Winner Overlay --- */
+        .winner-overlay {
+            position: fixed; top: 0; left: 0; width: 100%; height: 100%;
+            background: rgba(0,0,0,0.85); display: flex; flex-direction: column;
+            justify-content: center; align-items: center; z-index: 200;
+            opacity: 0; pointer-events: none; transition: opacity 0.5s;
+            text-align: center; padding: 20px;
+        }
+        .winner-overlay.visible { opacity: 1; pointer-events: auto; }
+        .winner-title { color: #fbbf24; font-size: 24px; margin-bottom: 10px; }
+        
+        .winner-visual-container {
+            width: 140px; height: 140px; margin: 10px auto 20px auto;
+            display: flex; justify-content: center; align-items: center;
+            animation: winnerBob 2s ease-in-out infinite alternate;
+        }
+        .winner-visual-icon { font-size: 120px; filter: drop-shadow(0 0 20px rgba(255, 215, 0, 0.5)); }
+        .winner-visual-img {
+            width: 130px; height: 130px; border-radius: 50%; border: 5px solid white;
+            box-shadow: 0 0 30px rgba(255, 215, 0, 0.6); object-fit: cover;
+        }
+        .winner-name {
+            color: white; font-size: 32px; font-weight: 800; margin-bottom: 20px;
+            line-height: 1.1; word-break: break-word; text-shadow: 0 2px 4px rgba(0,0,0,0.5); max-width: 90%;
+        }
+        .result-stats {
+            background: rgba(255,255,255,0.1); padding: 20px; border-radius: 15px;
+            margin-bottom: 30px; color: white; font-size: 18px; backdrop-filter: blur(5px);
+            border: 1px solid rgba(255,255,255,0.2); width: 80%; max-width: 300px;
+        }
+        .stat-line { margin: 5px 0; }
+        .win-text { color: var(--green); font-weight: bold; }
+        .loss-text { color: var(--red); font-weight: bold; }
+        .salary-text { color: var(--water-light); font-weight: bold; }
+        
+        .reset-btn {
+            background: var(--water-deep); color: white; border: 4px solid white;
+            padding: 15px 40px; font-size: 22px; font-weight: 700; border-radius: 50px;
+            font-family: 'Fredoka', sans-serif; cursor: pointer; box-shadow: 0 6px 0 rgba(0,0,0,0.3);
+        }
+        .reset-btn:active { transform: translateY(6px); box-shadow: none; }
+
+        .confetti {
+            position: absolute; width: 12px; height: 12px; background-color: var(--accent);
+            top: 50%; left: 50%; z-index: 150; pointer-events: none; border-radius: 3px;
+            animation: explode 1s ease-out forwards;
+        }
+        @keyframes explode {
+            0% { transform: translate(0, 0) scale(1) rotate(0deg); opacity: 1; }
+            100% { transform: translate(var(--tx), var(--ty)) scale(0) rotate(720deg); opacity: 0; }
+        }
+    </style>
+</head>
+<body>
+
+    <!-- Audio (Restored to check local assets) -->
+    <audio id="snd-flush" src="assets/flush.mp3" preload="auto"></audio>
+    <audio id="snd-gulp" src="assets/gulp.mp3" preload="auto"></audio>
+    <audio id="snd-win" src="assets/tada.mp3" preload="auto"></audio>
+    <audio id="snd-drop" src="assets/drop.mp3" preload="auto"></audio>
+
+    <nav class="top-bar">
+        <div class="bar-left">
+            <div class="currency-display">💰 <span id="currencyVal">1000</span></div>
+            <button class="icon-btn shop-btn" id="shopToggle">🛒 SHOP</button>
+        </div>
+        <div class="bar-right">
+            <button class="icon-btn" id="langSwitch">EN</button>
+        </div>
+    </nav>
+
+    <!-- SHOP MODAL -->
+    <div class="modal-overlay" id="shopModal">
+        <div class="shop-content">
+            <div class="shop-header">
+                <h2>TOILET SHOP</h2>
+                <button class="close-shop" id="closeShop">✕</button>
+            </div>
+            <div class="shop-grid" id="shopGrid"></div>
+        </div>
+    </div>
+
+    <!-- WINNER OVERLAY -->
+    <div class="winner-overlay" id="winnerOverlay">
+        <h2 class="winner-title" id="winTitle">The turd that wouldn't flush:</h2>
+        <div class="winner-visual-container" id="winAvatar"></div>
+        <div class="winner-name" id="winName">WINNER</div>
+        <div class="result-stats" id="resultStats"></div>
+        <button class="reset-btn" id="resetBtn">FLUSH AGAIN</button>
+        <button class="share-result-btn" id="shareResultBtn">
+            📤 SHARE RESULT 
+            <span id="shareRewardBadge" class="reward-badge">+300 💰</span>
+        </button>
+    </div>
+
+    <!-- GAME AREA -->
+    <div class="toilet-wrapper" id="toiletWrapper">
+        <div class="tank">
+            <div class="indicator-group">
+                <div class="indicator-text" id="flushLabel">FLUSH</div>
+                <div class="indicator-arrow"></div>
+            </div>
+            <div class="handle-base" id="flushHandle">
+                <div class="handle-lever"></div>
+            </div>
+        </div>
+        <div class="bowl">
+            <div class="water" id="bowlWater"></div>
+        </div>
+    </div>
+
+    <div class="footer-wrapper">
+        <div class="betting-panel">
+            <div class="bet-group grow">
+                <label class="bet-label" id="lbl-pick">Pick Winner</label>
+                <select class="bet-select" id="betTarget">
+                    <option value="">No Bet</option>
+                </select>
+            </div>
+            <div class="bet-group">
+                <label class="bet-label" id="lbl-wager">Wager</label>
+                <div class="wager-stepper">
+                    <button class="wager-btn" id="wagerMinus">-</button>
+                    <input type="number" class="bet-input" id="betAmount" value="0" readonly>
+                    <button class="wager-btn" id="wagerPlus">+</button>
+                </div>
+            </div>
+            <div class="bet-group">
+                <div style="height:17px"></div> 
+                <div class="payout-box">
+                    <span class="payout-label" id="lbl-payout">PAYOUT</span>
+                    <span class="payout-value">x<span id="multiplierDisplay">0</span></span>
+                </div>
+            </div>
+        </div>
+
+        <footer class="input-area">
+            <div class="input-wrapper">
+                <input type="text" class="floater-input" id="inputField" placeholder="Add option...">
+                <button class="upload-trigger" id="uploadTrigger" title="Upload Image">📷</button>
+                <input type="file" id="fileInput" accept="image/*" style="display:none;">
+            </div>
+            <button class="add-btn" id="addBtn">DROP</button>
+        </footer>
+    </div>
+
+    <div class="toast" id="toastMsg"></div>
+    <div id="socialCardCanvas">
+        <div class="card-bg-icon">🚽</div>
+        <div class="card-content">
+            <div class="card-header">TOILET SURVIVOR</div>
+            <div class="card-avatar-box" id="cardAvatar"></div>
+            <div class="card-winner-name" id="cardName"></div>
+            <div class="card-footer">The Toilet Flush Eliminator</div>
+        </div>
+    </div>
+
+    <script>
+        // --- CONFIG & STATE ---
+        const ITEMS_DB = [
+            { id: 'skin_clown', type: 'floater', content: '🤡', price: 250, name: { en: 'Clown Floater', cn: '小丑' } },
+            { id: 'skin_beer',  type: 'floater', content: '🍺', price: 250, name: { en: 'Beer Floater', cn: '啤酒' } },
+            { id: 'skin_burger',type: 'floater', content: '🍔', price: 250, name: { en: 'Burger Floater', cn: '汉堡' } },
+            { id: 'skin_undies',type: 'floater', content: '🩲', price: 250, name: { en: 'Undies Floater', cn: '裤裤' } },
+            { id: 'toilet_gold',type: 'toilet', cssClass: 'skin-gold', price: 500, name: { en: 'Gold Toilet', cn: '黄金马桶' } },
+            { id: 'toilet_diamond', type: 'toilet', cssClass: 'skin-diamond', price: 750, name: { en: 'Diamond Toilet', cn: '钻石马桶' } },
+            { id: 'toilet_chinese', type: 'toilet', cssClass: 'skin-chinese', price: 1000, name: { en: 'Chinese Style', cn: '中国风马桶' } },
+            { id: 'feat_upload', type: 'feature', price: 1500, name: { en: 'Upload License', cn: '图片上传许可' } }
+        ];
+
+        let gameState = {
+            currency: 1000,
+            // Automatically include upload license for testing
+            inventory: ['feat_upload'],
+            equipped: { floater: null, toilet: null },
+            stats: { wins: 0, loss: 0 }
+        };
+
+        let currentBetContext = { active: false, amount: 0, target: null, multiplier: 1 };
+        let isProcessing = false;
+        let isRoundActive = false;
+        let isEnglish = true;
+
+const i18n = {
+    en: { 
+        toggle: 'EN', placeholder: 'Add option...', addBtn: 'DROP', flushLabel: 'FLUSH', 
+        alert: 'Need at least 2 items!', winTitle: "The survivor is:", reset: 'FLUSH AGAIN',
+        noBet: 'No Bet', salary: 'Salary', win: 'Won', lost: 'Lost',
+        lblPick: "PICK WINNER", lblWager: "WAGER", lblPayout: "PAYOUT",
+        shopTitle: "TOILET SHOP", buy: "BUY", equip: "EQUIP", equipped: "EQUIPPED",
+        lockedFeature: "🚫 Locked! Buy the 'Upload License' in the Shop to use custom photos.",
+        shopBtn: "🛒 SHOP", shareBtn: "Share Challenge", shareResult: "📤 SHARE RESULT", emptyAlert: "Add items to share!",
+        cardHeader: "TOILET SURVIVOR",
+        cardFooter: "The Toilet Flush Eliminator",
+        
+        // --- NEW ADDITIONS ---
+        shareText: "I survived the flush! Play here: ",
+        copyToast: "Text Copied! You can paste it now. 📋" 
+    },
+    cn: { 
+        toggle: 'CN', placeholder: '加入选项...', addBtn: '丢下', flushLabel: '冲水', 
+        alert: '至少需要2个选项！', winTitle: '坚强的幸存者:', reset: '再玩一次',
+        noBet: '未下注', salary: '工资', win: '赢了', lost: '输了',
+        lblPick: "选择赢家", lblWager: "下注金额", lblPayout: "赔率",
+        shopTitle: "商店", buy: "购买", equip: "装备", equipped: "已装备",
+        lockedFeature: "🚫 功能未解锁！请先去商店购买“图片上传许可”。",
+        shopBtn: "🛒 商店", shareBtn: "分享挑战", shareResult: "📤 分享结果", emptyAlert: "请先添加选项！",
+        cardHeader: "马桶幸存者",
+        cardFooter: "马桶冲水淘汰赛",
+
+        // --- NEW ADDITIONS ---
+        shareText: "我从马桶大逃杀中幸存了！快来玩：",
+        copyToast: "文字已复制！现在可以直接粘贴了。📋"
+    }
+};
+
+        const currencyVal = document.getElementById('currencyVal');
+        const shopModal = document.getElementById('shopModal');
+        const shopGrid = document.getElementById('shopGrid');
+        const toiletWrapper = document.getElementById('toiletWrapper');
+        const bowlWater = document.getElementById('bowlWater');
+        const uploadTrigger = document.getElementById('uploadTrigger');
+        const fileInput = document.getElementById('fileInput');
+        const inputField = document.getElementById('inputField');
+        const addBtn = document.getElementById('addBtn');
+        const betTarget = document.getElementById('betTarget');
+        const betAmount = document.getElementById('betAmount');
+        const multiplierDisplay = document.getElementById('multiplierDisplay');
+        const winnerOverlay = document.getElementById('winnerOverlay');
+        const winName = document.getElementById('winName');
+        const winAvatar = document.getElementById('winAvatar');
+        const resultStats = document.getElementById('resultStats');
+        const flushHandle = document.getElementById('flushHandle');
+        const flushLabel = document.getElementById('flushLabel');
+        const wagerMinus = document.getElementById('wagerMinus');
+        const wagerPlus = document.getElementById('wagerPlus');
+
+        // Audio
+        const sndFlush = document.getElementById('snd-flush');
+        const sndGulp = document.getElementById('snd-gulp');
+        const sndWin = document.getElementById('snd-win');
+        const sndDrop = document.getElementById('snd-drop');
+
+        function init() {
+            const saved = localStorage.getItem('flushGameState');
+            if (saved) {
+                const loaded = JSON.parse(saved);
+                // Merge loaded state but ensure feat_upload is kept if user is testing
+                if(!loaded.inventory.includes('feat_upload')) loaded.inventory.push('feat_upload');
+                gameState = loaded;
+            }
+            updateCurrencyUI();
+            applyToiletSkin();
+            updateLanguage();
+            checkUrlParams(); 
+        }
+
+        function saveState() {
+            localStorage.setItem('flushGameState', JSON.stringify(gameState));
+            updateCurrencyUI();
+        }
+
+        function updateCurrencyUI() {
+            currencyVal.textContent = gameState.currency;
+        }
+
+        /* --- WAGER LOGIC --- */
+        wagerMinus.addEventListener('click', () => {
+            if(isRoundActive) return;
+            let val = parseInt(betAmount.value) || 0;
+            val = Math.max(0, val - 50);
+            betAmount.value = val;
+        });
+
+        wagerPlus.addEventListener('click', () => {
+            if(isRoundActive) return;
+            let val = parseInt(betAmount.value) || 0;
+            if (val + 50 <= gameState.currency) {
+                val += 50;
+                betAmount.value = val;
+            } else {
+                betAmount.style.color = 'red';
+                setTimeout(() => betAmount.style.color = 'var(--text)', 200);
+            }
+        });
+
+        /* --- SHOP LOGIC --- */
+        document.getElementById('shopToggle').addEventListener('click', () => {
+            renderShop();
+            shopModal.classList.add('open');
+        });
+        document.getElementById('closeShop').addEventListener('click', () => {
+            shopModal.classList.remove('open');
+        });
+
+        function renderShop() {
+            shopGrid.innerHTML = '';
+            const lang = isEnglish ? i18n.en : i18n.cn;
+
+            ITEMS_DB.forEach(item => {
+                const isOwned = gameState.inventory.includes(item.id);
+                const isEquipped = (item.type === 'floater' && gameState.equipped.floater === item.id) ||
+                                   (item.type === 'toilet' && gameState.equipped.toilet === item.id);
+                const itemName = isEnglish ? item.name.en : item.name.cn;
+
+                const div = document.createElement('div');
+                div.className = `shop-item ${isOwned ? 'owned' : ''} ${isEquipped ? 'equipped' : ''}`;
+                
+                let icon = '';
+                if(item.type === 'floater') icon = item.content;
+                else if(item.type === 'toilet') icon = '🚽';
+                else icon = '📷';
+
+                div.innerHTML = `
+                    <div class="item-icon">${icon}</div>
+                    <div class="item-name">${itemName}</div>
+                    <div class="item-cost">${isOwned ? '✔' : item.price + ' 💰'}</div>
+                `;
+
+                const btn = document.createElement('button');
+                btn.className = 'shop-action-btn';
+                
+                if (!isOwned) {
+                    btn.textContent = `${lang.buy}`;
+                    btn.classList.add('btn-buy');
+                    btn.onclick = () => buyItem(item);
+                } else if (item.type === 'feature') {
+                    btn.textContent = isEnglish ? "OWNED" : "已拥有";
+                    btn.disabled = true;
+                    btn.style.opacity = 0.5;
+                } else if (isEquipped) {
+                    btn.textContent = lang.equipped;
+                    btn.classList.add('btn-equipped');
+                    btn.onclick = () => unequipItem(item.type);
+                } else {
+                    btn.textContent = lang.equip;
+                    btn.classList.add('btn-equip');
+                    btn.onclick = () => equipItem(item);
+                }
+                div.appendChild(btn);
+                shopGrid.appendChild(div);
+            });
+        }
+
+function buyItem(item) {
+    if (gameState.currency >= item.price) {
+        // --- SUCCESS BLOCK ---
+        
+        // 1. Update Game State
+        gameState.currency -= item.price;
+        gameState.inventory.push(item.id);
+        saveState();
+        renderShop();
+        playSound(sndWin);
+
+        // 2. Track the Purchase (ONLY happen if they actually bought it)
+        if (typeof gtag === 'function') {
+            gtag('event', 'purchase_item', {
+                'item_name': item.name.en,
+                'value': item.price,
+                'currency': 'Coin' // Virtual Currency
+            });
+        }
+
+    } else {
+        // --- FAILURE BLOCK ---
+        alert("Not enough money!");
+        // Do NOT track anything here (or track a 'purchase_failed' event if you really want to)
+    }
+}
+
+        function equipItem(item) {
+            if (item.type === 'floater') gameState.equipped.floater = item.id;
+            if (item.type === 'toilet') gameState.equipped.toilet = item.id;
+            saveState();
+            renderShop();
+            applyToiletSkin();
+        }
+
+        function unequipItem(type) {
+            if (type === 'floater') gameState.equipped.floater = null;
+            if (type === 'toilet') gameState.equipped.toilet = null;
+            saveState();
+            renderShop();
+            applyToiletSkin();
+        }
+
+        function applyToiletSkin() {
+            toiletWrapper.classList.remove('skin-gold', 'skin-diamond', 'skin-chinese');
+            const equippedId = gameState.equipped.toilet;
+            if (equippedId) {
+                const item = ITEMS_DB.find(i => i.id === equippedId);
+                if (item && item.cssClass) toiletWrapper.classList.add(item.cssClass);
+            }
+        }
+
+        /* --- IMAGE UPLOAD LOGIC --- */
+        uploadTrigger.addEventListener('click', () => {
+            const lang = isEnglish ? i18n.en : i18n.cn;
+            if (gameState.inventory.includes('feat_upload')) {
+                if (!isRoundActive && !isProcessing) fileInput.click();
+            } else {
+                alert(lang.lockedFeature);
+            }
+        });
+
+        fileInput.addEventListener('change', (e) => {
+            const file = e.target.files[0];
+            if (!file) return;
+            const reader = new FileReader();
+            reader.onload = function(event) {
+                const img = new Image();
+                img.onload = function() {
+                    const canvas = document.createElement('canvas');
+                    const ctx = canvas.getContext('2d');
+                    canvas.width = 150; canvas.height = 150;
+                    const scale = Math.max(canvas.width / img.width, canvas.height / img.height);
+                    const x = (canvas.width / 2) - (img.width / 2) * scale;
+                    const y = (canvas.height / 2) - (img.height / 2) * scale;
+                    ctx.drawImage(img, x, y, img.width * scale, img.height * scale);
+                    addFloater(null, canvas.toDataURL('image/png'));
+                }
+                img.src = event.target.result;
+            }
+            reader.readAsDataURL(file);
+            fileInput.value = ''; 
+        });
+
+function addFloater(textInput, imageSrc = null) {
+    const currentCount = document.querySelectorAll('.floater:not(.flushing-down):not(.winner)').length;
+    if (currentCount >= 8) {
+        alert("Bowl is full!");
+        return;
+    }
+    
+    const text = textInput ? textInput : `Img ${currentCount + 1}`;
+    
+    // --- GA4 EVENT: ADD ITEM ---
+    if (typeof gtag === 'function') {
+        gtag('event', 'add_item', {
+            'item_type': imageSrc ? 'custom_image' : 'text',
+            'item_content': imageSrc ? 'user_uploaded_content' : textInput // Privacy: Don't track exact text if PII
+        });
+    }
+    // ---------------------------
+
+    playSound(sndDrop);
+    createFloaterDOM(text, imageSrc);
+    if (inputField) inputField.value = '';
+    inputField.focus();
+}
+
+        function getSafePosition() {
+            const existing = Array.from(document.querySelectorAll('.floater:not(.flushing-down):not(.winner)'));
+            const positions = existing.map(el => ({ left: parseFloat(el.style.left), top: parseFloat(el.style.top) }));
+            const minDist = 22;
+            for (let i = 0; i < 100; i++) {
+                const left = Math.floor(Math.random() * 65) + 10;
+                const top = Math.floor(Math.random() * 65) + 10;
+                let collision = false;
+                for (let pos of positions) {
+                    const dist = Math.sqrt(Math.pow(left - pos.left, 2) + Math.pow(top - pos.top, 2));
+                    if (dist < minDist) { collision = true; break; }
+                }
+                if (!collision) return { left, top };
+            }
+            return null;
+        }
+
+        function createFloaterDOM(text, imageSrc) {
+            const pos = getSafePosition();
+            if (!pos) return;
+
+            const floater = document.createElement('div');
+            floater.classList.add('floater');
+            floater.textContent = text; 
+            floater.style.left = `${pos.left}%`;
+            floater.style.top = `${pos.top}%`;
+            floater.style.setProperty('--delay', `-${Math.random() * 2}s`);
+
+            if (imageSrc) {
+                floater.classList.add('custom-img');
+                // Use quotes to be safe with CSS variables
+                floater.style.setProperty('--bg-img', `url("${imageSrc}")`);
+                floater.dataset.imgSrc = imageSrc;
+            } else {
+                const equippedId = gameState.equipped.floater;
+                if (equippedId) {
+                    const skin = ITEMS_DB.find(i => i.id === equippedId);
+                    if (skin) floater.style.setProperty('--floater-skin', `"${skin.content}"`);
+                }
+            }
+
+            floater.addEventListener('click', () => {
+                if (!isRoundActive && !isProcessing) {
+                    betTarget.value = text;
+                    document.querySelectorAll('.floater').forEach(f => f.classList.remove('selected'));
+                    floater.classList.add('selected');
+                }
+            });
+
+            bowlWater.appendChild(floater);
+            updateBettingControls();
+        }
+
+        function updateBettingControls() {
+            const floaters = Array.from(document.querySelectorAll('.floater:not(.flushing-down):not(.winner)'));
+            multiplierDisplay.textContent = floaters.length;
+            const currentSel = betTarget.value;
+            const lang = isEnglish ? i18n.en : i18n.cn;
+            betTarget.innerHTML = `<option value="">${lang.noBet}</option>`;
+            floaters.forEach(f => {
+                const opt = document.createElement('option');
+                opt.value = f.textContent;
+                opt.textContent = f.classList.contains('custom-img') ? f.textContent + " (Img)" : f.textContent;
+                betTarget.appendChild(opt);
+            });
+            betTarget.value = currentSel;
+        }
+
+        addBtn.addEventListener('click', () => {
+            if(!isProcessing && !isRoundActive && inputField.value.trim()) {
+                addFloater(inputField.value.trim());
+            }
+        });
+
+flushHandle.addEventListener('click', () => {
+    // 1. Safety Check
+    if (isProcessing) return;
+
+    const floaters = Array.from(document.querySelectorAll('.floater:not(.flushing-down):not(.winner)'));
+    
+    // 2. Game Logic / Validation
+    if (!isRoundActive) {
+        if (floaters.length < 2) { 
+            alert(isEnglish ? i18n.en.alert : i18n.cn.alert); 
+            return; 
+        }
+        
+        const betVal = parseInt(betAmount.value) || 0;
+        
+        if (betVal > 0) {
+            if (betVal > gameState.currency) { alert("Not enough coins!"); return; }
+            if (!betTarget.value) { alert("Pick a winner!"); return; }
+            
+            // Deduct money & Set Context
+            gameState.currency -= betVal;
+            saveState();
+            currentBetContext = { active: true, amount: betVal, target: betTarget.value, multiplier: floaters.length };
+
+            // --- GA4 EVENT: BET PLACED ---
+            if (typeof gtag === 'function') {
+                gtag('event', 'bet_placed', {
+                    'wager_amount': betVal,
+                    'odds_multiplier': floaters.length,
+                    'target_name': betTarget.value, // Who they bet on
+                    'currency_balance_after_wager': gameState.currency
+                });
+            }
+            // -----------------------------
+
+        } else {
+            currentBetContext = { active: false, amount: 0, target: null, multiplier: 0 };
+        }
+        
+        isRoundActive = true;
+        toggleControls(true);
+    }
+
+    // 3. Track General Flush Usage
+    if (typeof gtag === 'function') {
+        gtag('event', 'flush_toilet', {
+            'item_count': floaters.length,
+            'is_betting_round': isRoundActive
+        });
+    }
+
+    // 4. Start Animation
+    isProcessing = true;
+    playSound(sndFlush);
+    
+    const victimIndex = Math.floor(Math.random() * floaters.length);
+    const victim = floaters[victimIndex];
+    const survivors = floaters.filter((_, i) => i !== victimIndex);
+
+    victim.classList.add('flushing-down');
+    survivors.forEach(s => s.classList.add('surviving'));
+
+    setTimeout(() => {
+        playSound(sndGulp);
+        victim.remove();
+        survivors.forEach(s => s.classList.remove('surviving'));
+
+        if (survivors.length === 1) {
+            endRound(survivors[0]);
+        } else {
+            isProcessing = false;
+        }
+    }, 1000);
+});
+
+function endRound(winnerNode) {
+    // 1. Cleanup & Audio
+    winnerNode.remove();
+    playSound(sndWin);
+    triggerConfetti();
+
+    const wName = winnerNode.textContent;
+    winName.textContent = wName;
+    winAvatar.innerHTML = ''; 
+
+    // --- GA4 EVENT: ROUND RESULT ---
+    // Calculate win status before resetting anything
+    const userWonBet = currentBetContext.active && (currentBetContext.target === wName);
+    
+    if (typeof gtag === 'function') {
+        gtag('event', 'round_result', {
+            'winner_name': wName,
+            'is_custom_image': winnerNode.classList.contains('custom-img'),
+            'user_placed_bet': currentBetContext.active,
+            'user_won_bet': userWonBet,
+            'amount_won': userWonBet ? (currentBetContext.amount * currentBetContext.multiplier) : 0
+        });
+    }
+    // -------------------------------
+
+    // 2. Check Badge Status
+    const badge = document.getElementById('shareRewardBadge');
+    const todayStr = new Date().toDateString();
+    const lastShareDate = localStorage.getItem('lastShareDate');
+    if (lastShareDate !== todayStr) {
+        badge.style.display = 'block';
+    } else {
+        badge.style.display = 'none';
+    }
+
+    // ... (Keep the rest of your Visuals and Math logic here) ...
+    // Visuals
+    if (winnerNode.classList.contains('custom-img')) {
+        const img = document.createElement('img');
+        img.src = winnerNode.dataset.imgSrc;
+        img.className = 'winner-visual-img';
+        winAvatar.appendChild(img);
+    } else {
+        const icon = document.createElement('div');
+        icon.className = 'winner-visual-icon';
+        let content = getComputedStyle(winnerNode).getPropertyValue('--floater-skin');
+        content = content.replace(/"/g, '').trim(); 
+        if(!content) content = "💩"; 
+        icon.textContent = content;
+        winAvatar.appendChild(icon);
+    }
+    
+    // Math & Stats
+    const lang = isEnglish ? i18n.en : i18n.cn;
+    let salary = 50; 
+    let winAmt = 0;
+    let html = "";
+    if (currentBetContext.active) {
+        if (currentBetContext.target === wName) {
+            winAmt = currentBetContext.amount * currentBetContext.multiplier;
+            gameState.stats.wins++;
+            html += `<div class="stat-line win-text">${lang.win} +${winAmt} 💰</div>`;
+        } else {
+            gameState.stats.loss++;
+            html += `<div class="stat-line loss-text">${lang.lost} -${currentBetContext.amount} 💰</div>`;
+        }
+    }
+    html += `<div class="stat-line salary-text">${lang.salary} +${salary} 💰</div>`;
+    
+    gameState.currency += (winAmt + salary);
+    saveState();
+    resultStats.innerHTML = html;
+    
+    isRoundActive = false;
+    isProcessing = false;
+    winnerOverlay.classList.add('visible');
+}
+
+        document.getElementById('resetBtn').addEventListener('click', () => {
+            winnerOverlay.classList.remove('visible');
+            bowlWater.innerHTML = '';
+            toggleControls(false);
+            betAmount.value = 0;
+            currentBetContext = { active: false, amount: 0, target: null, multiplier: 1 };
+            updateBettingControls();
+        });
+
+document.getElementById('shareResultBtn').addEventListener('click', async () => {
+    const btn = document.getElementById('shareResultBtn');
+    const badge = document.getElementById('shareRewardBadge');
+    
+    // --- GA4 EVENT: SHARE INTERACTION ---
+    // Check if reward is visible BEFORE we hide it
+    const isRewardActive = badge.style.display !== 'none';
+    
+    if (typeof gtag === 'function') {
+        gtag('event', 'share_interaction', {
+            'content_type': 'winner_card',
+            'reward_claimed': isRewardActive // boolean: true if they got money
+        });
+    }
+    // ------------------------------------
+
+    // 1. Determine Language & Text
+    const lang = isEnglish ? i18n.en : i18n.cn;
+    const gameUrl = window.location.href;
+    const shareText = lang.shareText + gameUrl; 
+
+    // ... (Keep the rest of your specific share logic below) ...
+    let finalToastMsg = "";
+    const todayStr = new Date().toDateString();
+    const lastShareDate = localStorage.getItem('lastShareDate');
+
+    if (lastShareDate !== todayStr) {
+        gameState.currency += 300;
+        localStorage.setItem('lastShareDate', todayStr);
+        saveState();
+        playSound(sndWin);
+        badge.style.display = 'none';
+        finalToastMsg += isEnglish ? "Reward Claimed (+300💰)! " : "奖励已领取 (+300💰)！";
+    }
+
+    try {
+        await navigator.clipboard.writeText(shareText);
+        finalToastMsg += lang.copyToast;
+    } catch (err) {
+        console.error("Clipboard access failed", err);
+    }
+
+    if(finalToastMsg) showToast(finalToastMsg);
+
+    // ... (Keep the html2canvas image generation code here) ...
+    const originalText = btn.childNodes[0].nodeValue;
+    btn.childNodes[0].nodeValue = "⏳ GENERATING... "; 
+    
+    const winNameText = document.getElementById('winName').textContent;
+    document.getElementById('cardName').textContent = winNameText;
+    const cardAvatar = document.getElementById('cardAvatar');
+    const sourceAvatar = document.getElementById('winAvatar');
+    cardAvatar.innerHTML = '';
+    
+    const sourceImg = sourceAvatar.querySelector('.winner-visual-img');
+    const sourceIcon = sourceAvatar.querySelector('.winner-visual-icon');
+    
+    if (sourceImg) {
+        cardAvatar.appendChild(sourceImg.cloneNode(true));
+    } else if (sourceIcon) {
+        cardAvatar.appendChild(sourceIcon.cloneNode(true));
+    }
+
+    html2canvas(document.getElementById('socialCardCanvas'), { 
+        backgroundColor: null, 
+        scale: 2,
+        useCORS: true
+    }).then(canvas => {
+        canvas.toBlob(async (blob) => {
+            const file = new File([blob], "survivor.png", { type: "image/png" });
+            const shareData = { 
+                files: [file], 
+                title: 'Flush Survivor', 
+                text: shareText
+            };
+            
+            if (navigator.canShare && navigator.canShare({ files: [file] })) { 
+                try { 
+                    await navigator.share(shareData);
+                } catch (err) {} 
+            } else { 
+                const link = document.createElement('a'); 
+                link.download = 'survivor.png'; 
+                link.href = canvas.toDataURL(); 
+                link.click(); 
+            }
+            btn.childNodes[0].nodeValue = "📤 SHARE RESULT "; 
+        });
+    });
+});
+
+        function toggleControls(locked) {
+            inputField.disabled = locked;
+            addBtn.disabled = locked;
+            uploadTrigger.style.pointerEvents = locked ? 'none' : 'auto';
+            uploadTrigger.style.opacity = locked ? 0.5 : 1;
+            betTarget.disabled = locked;
+            wagerMinus.disabled = locked;
+            wagerPlus.disabled = locked;
+        }
+
+        function playSound(el) { if(el) { el.currentTime=0; el.play().catch(()=>{}); } }
+        
+function updateLanguage() {
+            const lang = isEnglish ? i18n.en : i18n.cn;
+            
+            // Main UI Elements
+            document.getElementById('langSwitch').textContent = lang.toggle;
+            document.getElementById('shopToggle').textContent = lang.shopBtn;
+            inputField.placeholder = lang.placeholder;
+            addBtn.textContent = lang.addBtn;
+            flushLabel.textContent = lang.flushLabel;
+            
+            // Winner Screen Elements
+            document.getElementById('winTitle').textContent = lang.winTitle;
+            document.getElementById('resetBtn').textContent = lang.reset;
+            
+            // Betting Panel Elements
+            document.getElementById('lbl-pick').textContent = lang.lblPick;
+            document.getElementById('lbl-wager').textContent = lang.lblWager;
+            document.getElementById('lbl-payout').textContent = lang.lblPayout;
+            
+            // Shop Elements
+            document.querySelector('.shop-header h2').textContent = lang.shopTitle;
+            
+            // Share Result Button (Winner Screen)
+            // We use childNodes[0] to update the text without deleting the <span> reward badge
+            document.getElementById('shareResultBtn').childNodes[0].nodeValue = lang.shareResult + " ";
+
+            // Hidden Social Card Elements
+            document.querySelector('.card-header').textContent = lang.cardHeader;
+            document.querySelector('.card-footer').textContent = lang.cardFooter;
+            
+            // Dynamic Refreshes
+            if(shopModal.classList.contains('open')) renderShop();
+            if(!isRoundActive) updateBettingControls();
+        }
+
+        document.getElementById('langSwitch').addEventListener('click', () => {
+            isEnglish = !isEnglish;
+            updateLanguage();
+        });
+
+        function triggerConfetti() {
+            for (let i = 0; i < 50; i++) {
+                const c = document.createElement('div');
+                c.className = 'confetti';
+                c.style.backgroundColor = ['#fcd34d','#38bdf8','#ffffff','#f87171'][Math.floor(Math.random()*4)];
+                c.style.setProperty('--tx', `${(Math.random()-0.5)*350}px`);
+                c.style.setProperty('--ty', `${(Math.random()-0.5)*350}px`);
+                document.body.appendChild(c);
+                setTimeout(()=>c.remove(), 1000);
+            }
+        }
+
+        function showToast(msg) {
+            const t = document.getElementById('toastMsg');
+            t.textContent = msg;
+            t.classList.add('show');
+            setTimeout(() => t.classList.remove('show'), 2000);
+        }
+
+        function checkUrlParams() {
+            const params = new URLSearchParams(window.location.search);
+            const data = params.get('challenge');
+            if (data) {
+                const names = decodeURIComponent(data).split(',');
+                bowlWater.innerHTML = '';
+                names.forEach((name, i) => { if(name.trim()) setTimeout(() => createFloaterDOM(name.trim()), i * 100); });
+                window.history.replaceState({}, document.title, window.location.pathname);
+            }
+        }
+
+        init();
+    </script>
+</body>
+</html>
