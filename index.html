@@ -136,8 +136,37 @@
 
         /* --- Toilet Assembly --- */
         .toilet-wrapper {
-            position: relative; flex-grow: 1; display: flex; justify-content: center;
-            align-items: center; width: 100%; margin-bottom: 120px;
+            position: relative; 
+            flex-grow: 1; 
+            display: flex; 
+            justify-content: center;
+            align-items: center; 
+            width: 100%; 
+            margin-bottom: 120px;
+            /* Smooth transition for resizing */
+            transition: transform 0.3s ease, margin 0.3s ease;
+        }
+
+        /* --- NEW: MOBILE SCALING FIX --- */
+        /* For standard mobile phones */
+        @media (max-width: 768px) {
+            .toilet-wrapper {
+                /* Scale the whole toilet down to 70% */
+                transform: scale(0.70);
+                /* Pull it closer to the betting panel to save vertical space */
+                margin-bottom: 20px; 
+                margin-top: -30px; 
+            }
+        }
+
+        /* For very small screens (e.g., iPhone SE) */
+        @media (max-width: 380px) {
+            .toilet-wrapper {
+                /* Scale down to 60% */
+                transform: scale(0.60);
+                margin-bottom: 0px;
+                margin-top: -50px;
+            }
         }
 
         .tank {
@@ -1246,3 +1275,4 @@ function updateLanguage() {
 </body>
 
 </html>
+
