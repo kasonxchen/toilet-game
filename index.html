@@ -541,18 +541,27 @@
             { id: 'feat_upload', type: 'feature', price: 1500, name: { en: 'Upload License', cn: '图片上传许可' } }
         ];
 
-        let gameState = {
+let gameState = {
             currency: 1000,
-            // Automatically include upload license for testing
-            inventory: ['feat_upload'],
+            inventory: [], // CHANGED: Removed 'feat_upload'
             equipped: { floater: null, toilet: null },
             stats: { wins: 0, loss: 0 }
         };
 
-        let currentBetContext = { active: false, amount: 0, target: null, multiplier: 1 };
-        let isProcessing = false;
-        let isRoundActive = false;
-        let isEnglish = true;
+        // ...
+
+        function init() {
+            const saved = localStorage.getItem('flushGameState');
+            if (saved) {
+                const loaded = JSON.parse(saved);
+                // CHANGED: Removed the line that forced 'feat_upload' back in
+                gameState = loaded;
+            }
+            updateCurrencyUI();
+            applyToiletSkin();
+            updateLanguage();
+            checkUrlParams(); 
+        }
 
 const i18n = {
     en: { 
@@ -1235,4 +1244,5 @@ function updateLanguage() {
         init();
     </script>
 </body>
+
 </html>
