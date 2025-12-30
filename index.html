@@ -559,7 +559,7 @@
 
     <script>
         // --- CONFIG & STATE ---
-         ITEMS_DB = [
+        const ITEMS_DB = [
             { id: 'skin_clown', type: 'floater', content: '🤡', price: 250, name: { en: 'Clown Floater', cn: '小丑' } },
             { id: 'skin_beer',  type: 'floater', content: '🍺', price: 250, name: { en: 'Beer Floater', cn: '啤酒' } },
             { id: 'skin_burger',type: 'floater', content: '🍔', price: 250, name: { en: 'Burger Floater', cn: '汉堡' } },
@@ -679,13 +679,13 @@ function init() {
             Analytics.updateUser(gameState);
         }
 
-        function saveState() {
-            localStorage.setItem('flushGameState', JSON.stringify(gameState));
-            updateCurrencyUI();
-            
-            // GA4: Update properties whenever state changes (money spent/earned)
-            Analytics.updateUser(gameState);
-        }}
+function saveState() {
+    localStorage.setItem('flushGameState', JSON.stringify(gameState));
+    updateCurrencyUI();
+    
+    // GA4: Update properties whenever state changes (money spent/earned)
+    Analytics.updateUser(gameState);
+}
 
         function updateCurrencyUI() {
             currencyVal.textContent = gameState.currency;
@@ -1290,6 +1290,7 @@ function updateLanguage() {
 </body>
 
 </html>
+
 
 
 
