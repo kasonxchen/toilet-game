@@ -1,6 +1,17 @@
 <!DOCTYPE html>
 <html lang="en">
 <head>
+    <!-- Baidu Tongji -->
+    <script>
+      var _hmt = _hmt || [];
+      (function() {
+        var hm = document.createElement("script");
+        // REPLACE THE STRING BELOW WITH YOUR ACTUAL BAIDU ID
+        hm.src = "https://hm.baidu.com/hm.js?YOUR_BAIDU_ID_HERE"; 
+        var s = document.getElementsByTagName("script")[0]; 
+        s.parentNode.insertBefore(hm, s);
+      })();
+    </script>
     <!-- Google tag (gtag.js) -->
     <script async src="https://www.googletagmanager.com/gtag/js?id=G-8Y4XXK9EMZ"></script>
     <script>
@@ -644,22 +655,114 @@ const i18n = {
         const sndWin = document.getElementById('snd-win');
         const sndDrop = document.getElementById('snd-drop');
 
+// --- MASTER ANALYTICS MANAGER (GA4 + BAIDU) ---
 const Analytics = {
+    // 1. Send Event
     track: (eventName, params = {}) => {
-        if (typeof gtag !== 'function') return;
-        // Standardize timestamp
-        const cleanParams = { ...params, event_timestamp_ms: Date.now() };
-        gtag('event', eventName, cleanParams);
+        // A. Send to GA4
+        if (typeof gtag === 'function') {
+            const cleanParams = { ...params, event_timestamp_ms: Date.now() };
+            gtag('event', eventName, cleanParams);
+        }
+
+        // B. Send to Baidu Tongji
+        if (typeof _hmt !== 'undefined') {
+            let category = 'General';
+            let action = eventName;
+            let label = '';
+            let value = 0;
+
+            // --- MAP GA4 EVENTS TO BAIDU FORMAT ---
+            switch (eventName) {
+                case 'spend_virtual_currency':
+                    category = 'Economy';
+                    action = 'Buy';
+                    label = params.item_name; // e.g., "Gold Toilet"
+                    value = params.value;     // e.g., 500
+                    break;
+
+                case 'view_item_list':
+                    category = 'Shop';
+                    action = 'Open';
+                    label = 'Main Shop';
+                    break;
+
+                case 'user_error':
+                    category = 'Error';
+                    action = params.error_type; // e.g., "insufficient_funds"
+                    label = params.target_item || 'unknown';
+                    break;
+
+                case 'add_item':
+                    category = 'Gameplay';
+                    action = 'Add Floater';
+                    label = params.item_category; // "custom_text" or "custom_image"
+                    break;
+
+                case 'bet_placed':
+                    category = 'Betting';
+                    action = 'Place Bet';
+                    label = 'Multiplier: ' + params.odds_multiplier;
+                    value = params.wager_amount;
+                    break;
+
+                case 'flush_toilet':
+                    category = 'Gameplay';
+                    action = 'Flush';
+                    label = params.is_betting_round ? 'Bet Mode' : 'Fun Mode';
+                    value = params.item_count;
+                    break;
+
+                case 'round_result':
+                    category = 'Gameplay';
+                    action = 'Result';
+                    label = params.user_won_bet ? 'Win' : (params.user_placed_bet ? 'Loss' : 'No Bet');
+                    value = params.amount_won;
+                    break;
+                
+                case 'feature_lock_hit':
+                    category = 'Friction';
+                    action = 'Locked Feature';
+                    label = params.feature_name;
+                    break;
+
+                default:
+                    // Fallback for any other events
+                    label = JSON.stringify(params).substring(0, 100); // Truncate to avoid errors
+                    break;
+            }
+
+            // Baidu API: _trackEvent(category, action, label, value)
+            _hmt.push(['_trackEvent', category, action, label, value]);
+        }
     },
+
+    // 2. Set User Properties
     updateUser: (gameState) => {
-        if (typeof gtag !== 'function') return;
-        gtag('set', 'user_properties', {
-            currency_balance: gameState.currency,
-            items_owned: gameState.inventory.length,
-            games_played: gameState.stats.wins + gameState.stats.loss,
-            // Calculate win rate safely
-            win_rate: ((gameState.stats.wins / (gameState.stats.wins + gameState.stats.loss)) || 0).toFixed(2)
-        });
+        // A. GA4 User Properties
+        if (typeof gtag === 'function') {
+            gtag('set', 'user_properties', {
+                currency_balance: gameState.currency,
+                items_owned: gameState.inventory.length,
+                games_played: gameState.stats.wins + gameState.stats.loss,
+                win_rate: ((gameState.stats.wins / (gameState.stats.wins + gameState.stats.loss)) || 0).toFixed(2)
+            });
+        }
+
+        // B. Baidu Custom Variables (Visitor Scope = 1)
+        // Baidu only allows 5 custom variables slots (1-5). We map the most important ones.
+        if (typeof _hmt !== 'undefined') {
+            // Slot 1: User Balance
+            _hmt.push(['_setCustomVar', 1, 'Balance', gameState.currency, 1]);
+            
+            // Slot 2: Games Played
+            const totalGames = gameState.stats.wins + gameState.stats.loss;
+            _hmt.push(['_setCustomVar', 2, 'GamesPlayed', totalGames, 1]);
+            
+            // Slot 3: Win Rate
+            const rate = ((gameState.stats.wins / (totalGames)) || 0).toFixed(2);
+            _hmt.push(['_setCustomVar', 3, 'WinRate', rate, 1]);
+        }
     }
 };
         
@@ -1290,6 +1393,7 @@ function updateLanguage() {
 </body>
 
 </html>
+
 
 
 
