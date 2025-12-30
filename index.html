@@ -559,7 +559,7 @@
 
     <script>
         // --- CONFIG & STATE ---
-        const ITEMS_DB = [
+         ITEMS_DB = [
             { id: 'skin_clown', type: 'floater', content: '🤡', price: 250, name: { en: 'Clown Floater', cn: '小丑' } },
             { id: 'skin_beer',  type: 'floater', content: '🍺', price: 250, name: { en: 'Beer Floater', cn: '啤酒' } },
             { id: 'skin_burger',type: 'floater', content: '🍔', price: 250, name: { en: 'Burger Floater', cn: '汉堡' } },
@@ -644,23 +644,48 @@ const i18n = {
         const sndWin = document.getElementById('snd-win');
         const sndDrop = document.getElementById('snd-drop');
 
-        function init() {
+const Analytics = {
+    track: (eventName, params = {}) => {
+        if (typeof gtag !== 'function') return;
+        // Standardize timestamp
+        const cleanParams = { ...params, event_timestamp_ms: Date.now() };
+        gtag('event', eventName, cleanParams);
+    },
+    updateUser: (gameState) => {
+        if (typeof gtag !== 'function') return;
+        gtag('set', 'user_properties', {
+            currency_balance: gameState.currency,
+            items_owned: gameState.inventory.length,
+            games_played: gameState.stats.wins + gameState.stats.loss,
+            // Calculate win rate safely
+            win_rate: ((gameState.stats.wins / (gameState.stats.wins + gameState.stats.loss)) || 0).toFixed(2)
+        });
+    }
+};
+        
+function init() {
             const saved = localStorage.getItem('flushGameState');
             if (saved) {
                 const loaded = JSON.parse(saved);
-                // CHANGED: Removed the line that forced 'feat_upload' back in
+                if(!loaded.inventory.includes('feat_upload')) loaded.inventory.push('feat_upload');
                 gameState = loaded;
             }
             updateCurrencyUI();
             applyToiletSkin();
             updateLanguage();
             checkUrlParams(); 
+            
+            // GA4: Set initial user properties
+            Analytics.updateUser(gameState);
         }
 
         function saveState() {
             localStorage.setItem('flushGameState', JSON.stringify(gameState));
             updateCurrencyUI();
-        }
+            
+            // GA4: Update properties whenever state changes (money spent/earned)
+            Analytics.updateUser(gameState);
+        }}
 
         function updateCurrencyUI() {
             currencyVal.textContent = gameState.currency;
@@ -687,9 +712,20 @@ const i18n = {
         });
 
         /* --- SHOP LOGIC --- */
-        document.getElementById('shopToggle').addEventListener('click', () => {
+document.getElementById('shopToggle').addEventListener('click', () => {
             renderShop();
             shopModal.classList.add('open');
+
+            // --- GA4: Track Shop Impression ---
+            Analytics.track('view_item_list', {
+                item_list_id: 'main_shop',
+                item_list_name: 'Toilet Shop',
+                items: ITEMS_DB.map(item => ({
+                    item_id: item.id,
+                    item_name: isEnglish ? item.name.en : item.name.cn,
+                    price: item.price // Virtual currency value
+                }))
+            });
         });
         document.getElementById('closeShop').addEventListener('click', () => {
             shopModal.classList.remove('open');
@@ -747,27 +783,28 @@ const i18n = {
 function buyItem(item) {
     if (gameState.currency >= item.price) {
         // --- SUCCESS BLOCK ---
-        
-        // 1. Update Game State
         gameState.currency -= item.price;
         gameState.inventory.push(item.id);
         saveState();
         renderShop();
         playSound(sndWin);
 
-        // 2. Track the Purchase (ONLY happen if they actually bought it)
-        if (typeof gtag === 'function') {
-            gtag('event', 'purchase_item', {
-                'item_name': item.name.en,
-                'value': item.price,
-                'currency': 'Coin' // Virtual Currency
-            });
-        }
+        // --- GA4: Virtual Currency Spend ---
+        Analytics.track('spend_virtual_currency', {
+            item_name: item.name.en, // Always use English name for consistency in reports
+            value: item.price,
+            virtual_currency_name: 'Coins'
+        });
 
     } else {
         // --- FAILURE BLOCK ---
         alert("Not enough money!");
-        // Do NOT track anything here (or track a 'purchase_failed' event if you really want to)
+        
+        // --- GA4: Track Friction ---
+        Analytics.track('user_error', {
+            error_type: 'insufficient_funds',
+            target_item: item.id
+        });
     }
 }
 
@@ -837,14 +874,12 @@ function addFloater(textInput, imageSrc = null) {
     
     const text = textInput ? textInput : `Img ${currentCount + 1}`;
     
-    // --- GA4 EVENT: ADD ITEM ---
-    if (typeof gtag === 'function') {
-        gtag('event', 'add_item', {
-            'item_type': imageSrc ? 'custom_image' : 'text',
-            'item_content': imageSrc ? 'user_uploaded_content' : textInput // Privacy: Don't track exact text if PII
-        });
-    }
-    // ---------------------------
+    // --- GA4: Track Add Item (Sanitized) ---
+    // We do NOT send the textInput. We only send the TYPE.
+    Analytics.track('add_item', {
+        item_category: imageSrc ? 'custom_image' : 'custom_text',
+        is_premium_feature: imageSrc ? true : false
+    });
 
     playSound(sndDrop);
     createFloaterDOM(text, imageSrc);
@@ -950,16 +985,13 @@ flushHandle.addEventListener('click', () => {
             saveState();
             currentBetContext = { active: true, amount: betVal, target: betTarget.value, multiplier: floaters.length };
 
-            // --- GA4 EVENT: BET PLACED ---
-            if (typeof gtag === 'function') {
-                gtag('event', 'bet_placed', {
-                    'wager_amount': betVal,
-                    'odds_multiplier': floaters.length,
-                    'target_name': betTarget.value, // Who they bet on
-                    'currency_balance_after_wager': gameState.currency
-                });
-            }
-            // -----------------------------
+            // --- GA4: Bet Placed (Sanitized) ---
+            Analytics.track('bet_placed', {
+                wager_amount: betVal,
+                odds_multiplier: floaters.length,
+                // We remove specific target_name to avoid high cardinality/PII
+                currency_balance: gameState.currency
+            });
 
         } else {
             currentBetContext = { active: false, amount: 0, target: null, multiplier: 0 };
@@ -969,13 +1001,11 @@ flushHandle.addEventListener('click', () => {
         toggleControls(true);
     }
 
-    // 3. Track General Flush Usage
-    if (typeof gtag === 'function') {
-        gtag('event', 'flush_toilet', {
-            'item_count': floaters.length,
-            'is_betting_round': isRoundActive
-        });
-    }
+    // 3. Track Flush Action
+    Analytics.track('flush_toilet', {
+        item_count: floaters.length,
+        is_betting_round: isRoundActive
+    });
 
     // 4. Start Animation
     isProcessing = true;
@@ -1011,20 +1041,16 @@ function endRound(winnerNode) {
     winName.textContent = wName;
     winAvatar.innerHTML = ''; 
 
-    // --- GA4 EVENT: ROUND RESULT ---
-    // Calculate win status before resetting anything
+    // --- GA4: Round Result (Sanitized) ---
     const userWonBet = currentBetContext.active && (currentBetContext.target === wName);
+    const winAmount = userWonBet ? (currentBetContext.amount * currentBetContext.multiplier) : 0;
     
-    if (typeof gtag === 'function') {
-        gtag('event', 'round_result', {
-            'winner_name': wName,
-            'is_custom_image': winnerNode.classList.contains('custom-img'),
-            'user_placed_bet': currentBetContext.active,
-            'user_won_bet': userWonBet,
-            'amount_won': userWonBet ? (currentBetContext.amount * currentBetContext.multiplier) : 0
-        });
-    }
-    // -------------------------------
+    Analytics.track('round_result', {
+        winner_type: winnerNode.classList.contains('custom-img') ? 'image' : 'text',
+        user_placed_bet: currentBetContext.active,
+        user_won_bet: userWonBet,
+        amount_won: winAmount
+    });
 
     // 2. Check Badge Status
     const badge = document.getElementById('shareRewardBadge');
@@ -1036,7 +1062,6 @@ function endRound(winnerNode) {
         badge.style.display = 'none';
     }
 
-    // ... (Keep the rest of your Visuals and Math logic here) ...
     // Visuals
     if (winnerNode.classList.contains('custom-img')) {
         const img = document.createElement('img');
@@ -1056,13 +1081,12 @@ function endRound(winnerNode) {
     // Math & Stats
     const lang = isEnglish ? i18n.en : i18n.cn;
     let salary = 50; 
-    let winAmt = 0;
+    
     let html = "";
     if (currentBetContext.active) {
         if (currentBetContext.target === wName) {
-            winAmt = currentBetContext.amount * currentBetContext.multiplier;
             gameState.stats.wins++;
-            html += `<div class="stat-line win-text">${lang.win} +${winAmt} 💰</div>`;
+            html += `<div class="stat-line win-text">${lang.win} +${winAmount} 💰</div>`;
         } else {
             gameState.stats.loss++;
             html += `<div class="stat-line loss-text">${lang.lost} -${currentBetContext.amount} 💰</div>`;
@@ -1070,7 +1094,7 @@ function endRound(winnerNode) {
     }
     html += `<div class="stat-line salary-text">${lang.salary} +${salary} 💰</div>`;
     
-    gameState.currency += (winAmt + salary);
+    gameState.currency += (winAmount + salary);
     saveState();
     resultStats.innerHTML = html;
     
@@ -1078,7 +1102,7 @@ function endRound(winnerNode) {
     isProcessing = false;
     winnerOverlay.classList.add('visible');
 }
-
+        
         document.getElementById('resetBtn').addEventListener('click', () => {
             winnerOverlay.classList.remove('visible');
             bowlWater.innerHTML = '';
@@ -1266,6 +1290,7 @@ function updateLanguage() {
 </body>
 
 </html>
+
 
 
 
