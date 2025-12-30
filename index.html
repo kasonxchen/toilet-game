@@ -655,91 +655,72 @@ const i18n = {
         const sndWin = document.getElementById('snd-win');
         const sndDrop = document.getElementById('snd-drop');
 
-// --- MASTER ANALYTICS MANAGER (GA4 + BAIDU) ---
+// --- MASTER ANALYTICS MANAGER (GA4 + BAIDU FREE MODE) ---
 const Analytics = {
     // 1. Send Event
     track: (eventName, params = {}) => {
-        // A. Send to GA4
+        // A. Send to GA4 (Standard Mode)
         if (typeof gtag === 'function') {
             const cleanParams = { ...params, event_timestamp_ms: Date.now() };
             gtag('event', eventName, cleanParams);
         }
 
-        // B. Send to Baidu Tongji
+        // B. Send to Baidu Tongji (Virtual Pageview Mode)
         if (typeof _hmt !== 'undefined') {
-            let category = 'General';
-            let action = eventName;
-            let label = '';
-            let value = 0;
+            // Construct a fake URL structure: /vpv/[Category]/[Action]/[Label]
+            let vUrl = '/vpv/unknown';
 
-            // --- MAP GA4 EVENTS TO BAIDU FORMAT ---
             switch (eventName) {
                 case 'spend_virtual_currency':
-                    category = 'Economy';
-                    action = 'Buy';
-                    label = params.item_name; // e.g., "Gold Toilet"
-                    value = params.value;     // e.g., 500
+                    // Example: /vpv/economy/buy/gold_toilet
+                    vUrl = `/vpv/economy/buy/${params.item_name || 'unknown'}`;
                     break;
 
                 case 'view_item_list':
-                    category = 'Shop';
-                    action = 'Open';
-                    label = 'Main Shop';
+                    // Example: /vpv/shop/open
+                    vUrl = '/vpv/shop/open';
                     break;
 
                 case 'user_error':
-                    category = 'Error';
-                    action = params.error_type; // e.g., "insufficient_funds"
-                    label = params.target_item || 'unknown';
+                    // Example: /vpv/error/insufficient_funds/skin_gold
+                    vUrl = `/vpv/error/${params.error_type}/${params.target_item || 'general'}`;
                     break;
 
                 case 'add_item':
-                    category = 'Gameplay';
-                    action = 'Add Floater';
-                    label = params.item_category; // "custom_text" or "custom_image"
+                    // Example: /vpv/gameplay/add/custom_text
+                    vUrl = `/vpv/gameplay/add/${params.item_category}`;
                     break;
 
                 case 'bet_placed':
-                    category = 'Betting';
-                    action = 'Place Bet';
-                    label = 'Multiplier: ' + params.odds_multiplier;
-                    value = params.wager_amount;
+                    // Example: /vpv/betting/place_bet/wager_100
+                    vUrl = `/vpv/betting/place_bet/wager_${params.wager_amount}`;
                     break;
 
                 case 'flush_toilet':
-                    category = 'Gameplay';
-                    action = 'Flush';
-                    label = params.is_betting_round ? 'Bet Mode' : 'Fun Mode';
-                    value = params.item_count;
+                    // Example: /vpv/gameplay/flush/item_count_5
+                    vUrl = `/vpv/gameplay/flush/item_count_${params.item_count}`;
                     break;
 
                 case 'round_result':
-                    category = 'Gameplay';
-                    action = 'Result';
-                    label = params.user_won_bet ? 'Win' : (params.user_placed_bet ? 'Loss' : 'No Bet');
-                    value = params.amount_won;
+                    // Example: /vpv/gameplay/result/win
+                    const status = params.user_won_bet ? 'win' : (params.user_placed_bet ? 'loss' : 'no_bet');
+                    vUrl = `/vpv/gameplay/result/${status}`;
                     break;
                 
                 case 'feature_lock_hit':
-                    category = 'Friction';
-                    action = 'Locked Feature';
-                    label = params.feature_name;
-                    break;
-
-                default:
-                    // Fallback for any other events
-                    label = JSON.stringify(params).substring(0, 100); // Truncate to avoid errors
+                    // Example: /vpv/friction/locked/upload_feature
+                    vUrl = `/vpv/friction/locked/${params.feature_name}`;
                     break;
             }
 
-            // Baidu API: _trackEvent(category, action, label, value)
-            _hmt.push(['_trackEvent', category, action, label, value]);
+            // Send the fake pageview to Baidu
+            _hmt.push(['_trackPageview', vUrl]);
         }
     },
 
-    // 2. Set User Properties
+    // 2. Set User Properties 
     updateUser: (gameState) => {
-        // A. GA4 User Properties
+        // A. GA4 (Still works fine)
         if (typeof gtag === 'function') {
             gtag('set', 'user_properties', {
                 currency_balance: gameState.currency,
@@ -749,20 +730,8 @@ const Analytics = {
             });
         }
 
-        // B. Baidu Custom Variables (Visitor Scope = 1)
-        // Baidu only allows 5 custom variables slots (1-5). We map the most important ones.
-        if (typeof _hmt !== 'undefined') {
-            // Slot 1: User Balance
-            _hmt.push(['_setCustomVar', 1, 'Balance', gameState.currency, 1]);
-            
-            // Slot 2: Games Played
-            const totalGames = gameState.stats.wins + gameState.stats.loss;
-            _hmt.push(['_setCustomVar', 2, 'GamesPlayed', totalGames, 1]);
-            
-            // Slot 3: Win Rate
-            const rate = ((gameState.stats.wins / (totalGames)) || 0).toFixed(2);
-            _hmt.push(['_setCustomVar', 3, 'WinRate', rate, 1]);
-        }
+        // B. Baidu: SKIPPED
+        // Custom Variables are paid now. We stop sending them to avoid errors.
     }
 };
         
@@ -1393,6 +1362,7 @@ function updateLanguage() {
 </body>
 
 </html>
+
 
 
 
